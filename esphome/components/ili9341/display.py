@@ -38,8 +38,6 @@ ILI9341_MODEL = cv.enum(MODELS, upper=True, space="_")
 
 COLOR_PALETTE = cv.one_of("NONE", "GRAYSCALE", "IMAGE_ADAPTIVE")
 
-CONF_RAW_DATA_ID = "raw_data_id"
-
 
 def _validate(config):
     if (
