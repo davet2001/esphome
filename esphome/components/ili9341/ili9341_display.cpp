@@ -133,8 +133,13 @@ uint8_t ILI9341Display::convert_to_8bit_color_(uint16_t color_16bit) {
 }
 
 void ILI9341Display::fill(Color color) {
-  auto color565 = display::ColorUtil::color_to_565(color);
-  memset(this->buffer_, convert_to_8bit_color_(color565), this->get_buffer_length_());
+  uint8_t buf_val = 0;
+  if (this->buffer_color_mode_ == BITS_8) {
+    buf_val = display::ColorUtil::color_to_332(color);
+  } else {  // if (this->buffer_color_mode_ == BITS_8_INDEXED)
+    buf_val = display::ColorUtil::color_to_index8_palette888(color, this->palette_);
+  }
+  memset(this->buffer_, buf_val, this->get_buffer_length_());
   this->x_low_ = 0;
   this->y_low_ = 0;
   this->x_high_ = this->get_width_internal() - 1;
@@ -182,8 +187,7 @@ void HOT ILI9341Display::draw_absolute_pixel_internal(int x, int y, Color color)
 
   uint32_t pos = (y * width_) + x;
   if (this->buffer_color_mode_ == BITS_8) {
-    auto color565 = display::ColorUtil::color_to_565(color);
-    buffer_[pos] = convert_to_8bit_color_(color565);
+    buffer_[pos] = display::ColorUtil::color_to_332(color);
   } else {  // if (this->buffer_color_mode_ == BITS_8_INDEXED) {
     uint8_t index = display::ColorUtil::color_to_index8_palette888(color, this->palette_);
     buffer_[pos] = index;
